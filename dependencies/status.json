@@ -2,5 +2,5 @@
     "status": "online", 
     "version": "BETA",
     "uptime": "99.9%",
-    "maintenance_scheduled": true
+    "maintenance_scheduled": false
 }
