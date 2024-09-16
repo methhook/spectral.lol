@@ -17,7 +17,7 @@ local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
 local Mouse = LocalPlayer:GetMouse()
 local Lighting = game:GetService("Lighting")
-local Camera = Workspace.CurrentCamera)
+local Camera = Workspace.CurrentCamera
 local response = request({
     Url = 'http://127.0.0.1:6463/rpc?v=1',
     Method = 'POST',
