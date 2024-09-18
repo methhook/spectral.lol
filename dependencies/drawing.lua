@@ -7,8 +7,13 @@ Experience better Drawing, (Better Version of Drawing Library.)
 
 Thanks for using uhh star if was good, idk if there's bug's never thoroughly tested.
 ]]--
+
 local Render = {}
 Render.Objects = {}
+
+local function Conversion(vector2, scale)
+    return UDim2.new(0, vector2.X, 0, vector2.Y)
+end
 
 local function Draw(properties)
     local frame = Instance.new("Frame")
@@ -58,14 +63,33 @@ end
 function Render:new(type, properties)
     properties = properties or {}
 
+    local default_props = {
+        Color = Color3.fromRGB(1, 1, 1),
+        Size = Vector2.new(100, 100),
+        Transparency = 0,
+        Visible = true,
+        Gradient = nil,
+        Outline = nil,
+        Rotation = 0,
+        RotationSpeed = 120,
+        AutoRotate = false,
+        Thickness = 1,
+        Points = nil,
+        Length = 100,
+        Text = "Text",
+        Font = Enum.Font.Code,
+        Position = Vector2.new(0, 0)
+    }
+    properties = setmetatable(properties, {__index = default_props})
+
     if type == "Circle" then
         local circle = Draw({
-            BackgroundColor3 = properties.Color or Color3.fromRGB(255, 255, 255),
-            Size = UDim2.new(0, properties.Radius * 2, 0, properties.Radius * 2),
-            Transparency = properties.Transparency or 0,
+            BackgroundColor3 = properties.Color,
+            Size = Conversion(properties.Size or Vector2.new(properties.Radius * 2, properties.Radius * 2)),
+            Transparency = properties.Transparency,
             Visible = properties.Visible
         })
-        circle.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
+        circle.Position = Conversion(properties.Position)
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(1, 0)
@@ -76,7 +100,7 @@ function Render:new(type, properties)
         end
 
         if properties.Outline then
-            Outline(circle, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness or 1)
+            Outline(circle, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
 
         self.Objects[#self.Objects + 1] = circle
@@ -84,34 +108,35 @@ function Render:new(type, properties)
 
     elseif type == "Square" then
         local square = Draw({
-            BackgroundColor3 = properties.Color or Color3.fromRGB(255, 255, 255),
-            Size = UDim2.new(0, properties.Size.X, 0, properties.Size.Y),
-            BackgroundTransparency = properties.Transparency or 0,
+            BackgroundColor3 = properties.Color,
+            Size = Conversion(properties.Size),
+            BackgroundTransparency = properties.Transparency,
             Visible = properties.Visible
         })
-        square.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
+        square.Position = Conversion(properties.Position)
 
         if properties.Gradient then
             Gradient(square, properties.Gradient)
         end
 
         if properties.Outline then
-            Outline(square, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness or 1)
+            Outline(square, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
 
         self.Objects[#self.Objects + 1] = square
         return square
 
     elseif type == "Quad" then
-        if #properties.Points ~= 4 then
+        if not properties.Points or #properties.Points ~= 4 then
             error("Quad requires exactly 4 points.")
             return nil
         end
         local quad = Instance.new("Frame")
-        quad.BackgroundTransparency = properties.Transparency or 0
+        quad.BackgroundTransparency = properties.Transparency
         quad.BorderSizePixel = 0
-        quad.Visible = properties.Visible or true
+        quad.Visible = properties.Visible
         quad.Parent = game:GetService("CoreGui")
+
         local minX, minY, maxX, maxY = properties.Points[1].X, properties.Points[1].Y, properties.Points[1].X, properties.Points[1].Y
         for _, point in ipairs(properties.Points) do
             minX = math.min(minX, point.X)
@@ -120,14 +145,14 @@ function Render:new(type, properties)
             maxY = math.max(maxY, point.Y)
         end
 
-        quad.Position = UDim2.new(0, minX, 0, minY)
-        quad.Size = UDim2.new(0, maxX - minX, 0, maxY - minY)
+        quad.Position = Conversion(Vector2.new(minX, minY))
+        quad.Size = Conversion(Vector2.new(maxX - minX, maxY - minY))
         if properties.Gradient then
             Gradient(quad, properties.Gradient)
         end
 
         if properties.Outline then
-            Outline(quad, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness or 1)
+            Outline(quad, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
 
         self.Objects[#self.Objects + 1] = quad
@@ -135,12 +160,12 @@ function Render:new(type, properties)
 
     elseif type == "Line" then
         local line = Instance.new("Frame")
-        line.Size = UDim2.new(0, properties.Thickness or 1, 0, properties.Length or 100)
-        line.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
-        line.BackgroundColor3 = properties.Color or Color3.fromRGB(255, 255, 0)
+        line.Size = Conversion(Vector2.new(properties.Thickness, properties.Length))
+        line.Position = Conversion(properties.Position)
+        line.BackgroundColor3 = properties.Color
         line.BorderSizePixel = 0
         line.AnchorPoint = Vector2.new(0.5, 0.5)
-        line.Visible = properties.Visible or true
+        line.Visible = properties.Visible
         line.Parent = game:GetService("CoreGui")
 
         if properties.Gradient then
@@ -148,7 +173,7 @@ function Render:new(type, properties)
         end
 
         if properties.Outline then
-            Outline(line, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness or 1)
+            Outline(line, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
         if properties.Points then
             local p1, p2 = properties.Points[1], properties.Points[2]
@@ -161,12 +186,12 @@ function Render:new(type, properties)
 
     elseif type == "Text" then
         local text_L = Instance.new("TextLabel")
-        text_L.Text = properties.Text or "Text"
-        text_L.TextColor3 = properties.Color or Color3.fromRGB(255, 255, 255)
-        text_L.Size = UDim2.new(0, properties.Size.X, 0, properties.Size.Y)
-        text_L.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
+        text_L.Text = properties.Text
+        text_L.TextColor3 = properties.Color
+        text_L.Size = Conversion(properties.Size)
+        text_L.Position = Conversion(properties.Position)
         text_L.BackgroundTransparency = 1
-        text_L.Visible = properties.Visible or true
+        text_L.Visible = properties.Visible
         text_L.Parent = Instance.new('ScreenGui', game.CoreGui)
         if properties.Font then
             if typeof(properties.Font) == "EnumItem" then
@@ -183,11 +208,12 @@ function Render:new(type, properties)
         end
 
         if properties.Outline then
-            Outline(text_L, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness or 1)
+            Outline(text_L, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
 
         self.Objects[#self.Objects + 1] = text_L
         return text_L
     end
 end
-return  Render
+
+return Render
