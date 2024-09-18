@@ -158,6 +158,7 @@ function Render:new(type, properties)
         text_L.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
         text_L.BackgroundTransparency = 1
         text_L.Visible = properties.Visible or true
+        text_L.Parent = Instance.new('ScreenGui', game.CoreGui)
         if properties.Font then
             if typeof(properties.Font) == "EnumItem" then
                 text_L.Font = properties.Font
