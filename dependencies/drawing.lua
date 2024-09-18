@@ -11,7 +11,7 @@ Thanks for using uhh star if was good, idk if there's bug's never thoroughly tes
 local Render = {}
 Render.Objects = {}
 
-local function Conversion(vector2, scale)
+local function Conversion(vector2)
     return UDim2.new(0, vector2.X, 0, vector2.Y)
 end
 
@@ -64,14 +64,14 @@ function Render:new(type, properties)
     properties = properties or {}
 
     local default_props = {
-        Color = Color3.fromRGB(1, 1, 1),
+        Color = Color3.fromRGB(255, 255, 255),
         Size = Vector2.new(100, 100),
         Transparency = 0,
         Visible = true,
         Gradient = nil,
         Outline = nil,
         Rotation = 0,
-        RotationSpeed = 120,
+        RotationSpeed = 10,
         AutoRotate = false,
         Thickness = 1,
         Points = nil,
@@ -80,6 +80,7 @@ function Render:new(type, properties)
         Font = Enum.Font.Code,
         Position = Vector2.new(0, 0)
     }
+
     properties = setmetatable(properties, {__index = default_props})
 
     if type == "Circle" then
