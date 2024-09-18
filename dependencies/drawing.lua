@@ -1,3 +1,12 @@
+--[[
+Made by Summon
+Dont Steal SKIDDER(S)
+
+
+Experience better Drawing, (Better Version of Drawing Library.)
+
+Thanks for using uhh star if was good, idk if there's bug's never thoroughly tested.
+]]--
 local Render = {}
 Render.Objects = {}
 
