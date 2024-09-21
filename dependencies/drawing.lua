@@ -38,6 +38,8 @@ local function Gradient(object, properties)
 
     gradient.Rotation = properties.Rotation or 0
     gradient.Parent = object
+    gradient.Enabled = properties.Visible ~= false
+
     if properties.AutoRotate then
         local Rotation_Speed = properties.RotationSpeed or 10
         local Start = tick()
@@ -48,6 +50,7 @@ local function Gradient(object, properties)
         end)
     end
 end
+
 
 local function Outline(object, color, thickness)
     local outline = Instance.new("UIStroke")
@@ -64,8 +67,7 @@ function Render:new(type, properties)
         Size = Vector2.new(100, 100),
         Transparency = 0,
         Visible = true,
-        Gradient = false,
-        GradientProperties = nil,
+        Gradient = nil,
         Outline = nil,
         Rotation = 0,
         RotationSpeed = 10,
@@ -94,7 +96,7 @@ function Render:new(type, properties)
         corner.Parent = circle
 
         if properties.Gradient then
-            Gradient(circle, properties.GradientProperties)
+            Gradient(circle, properties.Gradient)
         end
 
         if properties.Outline then
@@ -114,7 +116,7 @@ function Render:new(type, properties)
         square.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
 
         if properties.Gradient then
-            Gradient(square, properties.GradientProperties)
+            Gradient(square, properties.Gradient)
         end
 
         if properties.Outline then
@@ -147,7 +149,7 @@ function Render:new(type, properties)
         quad.Size = UDim2.new(0, maxX - minX, 0, maxY - minY)
 
         if properties.Gradient then
-            Gradient(quad, properties.GradientProperties)
+            Gradient(quad, properties.Gradient)
         end
 
         if properties.Outline then
@@ -179,12 +181,11 @@ function Render:new(type, properties)
         end
 
         if properties.Gradient then
-            Gradient(line, properties.GradientProperties)
+            Gradient(line, properties.Gradient)
         end
 
         self.Objects[#self.Objects + 1] = line
         return line
-
     elseif type == "Text" then
         local text_L = Instance.new("TextLabel")
         text_L.Text = properties.Text
@@ -206,7 +207,7 @@ function Render:new(type, properties)
         end
 
         if properties.Gradient then
-            Gradient(text_L, properties.GradientProperties)
+            Gradient(text_L, properties.Gradient)
         end
 
         if properties.Outline then
@@ -217,5 +218,4 @@ function Render:new(type, properties)
         return text_L
     end
 end
-
 return Render
