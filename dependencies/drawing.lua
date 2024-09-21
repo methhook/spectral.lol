@@ -11,10 +11,6 @@ Thanks for using uhh star if was good, idk if there's bug's never thoroughly tes
 local Render = {}
 Render.Objects = {}
 
-local function Conversion(vector2)
-    return UDim2.new(0, vector2.X, 0, vector2.Y)
-end
-
 local function Draw(properties)
     local frame = Instance.new("Frame")
     frame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -74,8 +70,8 @@ function Render:new(type, properties)
         RotationSpeed = 10,
         AutoRotate = false,
         Thickness = 1,
-        Points = nil,
-        Length = 100,
+        From = nil,
+        To = nil,
         Text = "Text",
         Font = Enum.Font.Code,
         Position = Vector2.new(0, 0)
@@ -86,11 +82,11 @@ function Render:new(type, properties)
     if type == "Circle" then
         local circle = Draw({
             BackgroundColor3 = properties.Color,
-            Size = Conversion(properties.Size or Vector2.new(properties.Radius * 2, properties.Radius * 2)),
+            Size = UDim2.new(0, properties.Size.X, 0, properties.Size.Y),
             Transparency = properties.Transparency,
             Visible = properties.Visible
         })
-        circle.Position = Conversion(properties.Position)
+        circle.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(1, 0)
@@ -110,11 +106,11 @@ function Render:new(type, properties)
     elseif type == "Square" then
         local square = Draw({
             BackgroundColor3 = properties.Color,
-            Size = Conversion(properties.Size),
+            Size = UDim2.new(0, properties.Size.X, 0, properties.Size.Y),
             BackgroundTransparency = properties.Transparency,
             Visible = properties.Visible
         })
-        square.Position = Conversion(properties.Position)
+        square.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
 
         if properties.Gradient then
             Gradient(square, properties.Gradient)
@@ -146,8 +142,9 @@ function Render:new(type, properties)
             maxY = math.max(maxY, point.Y)
         end
 
-        quad.Position = Conversion(Vector2.new(minX, minY))
-        quad.Size = Conversion(Vector2.new(maxX - minX, maxY - minY))
+        quad.Position = UDim2.new(0, minX, 0, minY)
+        quad.Size = UDim2.new(0, maxX - minX, 0, maxY - minY)
+
         if properties.Gradient then
             Gradient(quad, properties.Gradient)
         end
@@ -161,39 +158,41 @@ function Render:new(type, properties)
 
     elseif type == "Line" then
         local line = Instance.new("Frame")
-        line.Size = Conversion(Vector2.new(properties.Thickness, properties.Length))
-        line.Position = Conversion(properties.Position)
         line.BackgroundColor3 = properties.Color
         line.BorderSizePixel = 0
         line.AnchorPoint = Vector2.new(0.5, 0.5)
         line.Visible = properties.Visible
-        line.Parent = game:GetService("CoreGui")
+        line.Parent = Instance.new("ScreenGui", game.CoreGui)
 
-        if properties.Gradient then
-            Gradient(line, properties.Gradient)
+        if properties.From and properties.To then
+            local direction = (properties.To - properties.From).Unit
+            local length = (properties.To - properties.From).Magnitude
+            local thickness = properties.Thickness or 1
+            line.Size = UDim2.new(0, length, 0, thickness)
+            line.Position = UDim2.new(0, (properties.From.X + properties.To.X) / 2, 0, (properties.From.Y + properties.To.Y) / 2)
+            line.Rotation = math.deg(math.atan2(direction.Y, direction.X))
         end
 
         if properties.Outline then
             Outline(line, properties.Outline.Color or Color3.fromRGB(0, 0, 0), properties.Outline.Thickness)
         end
-        if properties.Points then
-            local p1, p2 = properties.Points[1], properties.Points[2]
-            local angle = math.atan2(p2.Y - p1.Y, p2.X - p1.X)
-            line.Rotation = math.deg(angle)
+
+        if properties.Gradient then
+            Gradient(line, properties.Gradient)
         end
 
         self.Objects[#self.Objects + 1] = line
         return line
-
     elseif type == "Text" then
         local text_L = Instance.new("TextLabel")
         text_L.Text = properties.Text
         text_L.TextColor3 = properties.Color
-        text_L.Size = Conversion(properties.Size)
-        text_L.Position = Conversion(properties.Position)
+        text_L.Size = UDim2.new(0, properties.Size.X, 0, properties.Size.Y)
+        text_L.Position = UDim2.new(0, properties.Position.X, 0, properties.Position.Y)
         text_L.BackgroundTransparency = 1
         text_L.Visible = properties.Visible
         text_L.Parent = Instance.new('ScreenGui', game.CoreGui)
+
         if properties.Font then
             if typeof(properties.Font) == "EnumItem" then
                 text_L.Font = properties.Font
@@ -216,5 +215,4 @@ function Render:new(type, properties)
         return text_L
     end
 end
-
 return Render
