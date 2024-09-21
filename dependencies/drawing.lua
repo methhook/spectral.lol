@@ -8,8 +8,13 @@ Experience better Drawing, (Better Version of Drawing Library.)
 Thanks for using uhh star if was good, idk if there's bug's never thoroughly tested.
 ]]--
 
-local Render = {}
-Render.Objects = {}
+local Render = {};
+Render.Objects = {};
+local protection = protectgui or (syn and syn.protect_gui) or (function() end);
+local ScreenGui = Instance.new("ScreenGui");
+protection(ScreenGui);
+ScreenGui.Parent = game.CoreGui or game:GetService("CoreGui");
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 
 local function Draw(properties)
     local frame = Instance.new("Frame")
